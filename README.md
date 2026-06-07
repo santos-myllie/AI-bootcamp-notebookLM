@@ -81,3 +81,73 @@ Registro das principais barreiras contextuais encontradas durante a curadoria de
       
 ## 📖 4. Miniguia de Estudo e Execução
 *Consulte esta seção para entender o fluxo de estudos sugerido, cronogramas de simulados e orientações de como interagir com o NotebookLM para obter feedbacks em tempo real sobre seus erros e acertos.*
+
+Aqui está o conteúdo estruturado e formatado em **Markdown**, pronto para ser copiado e colado no arquivo `README.md` do seu repositório no GitHub.
+
+---
+
+# 🚀 ServiceNow Certified Application Developer (CAD) - Study Guide 2026
+
+Este repositório contém um guia consolidado de estudos para a certificação **ServiceNow CAD 2026**, focado em arquitetura de aplicações escopadas, lógica de scripting e segurança.
+
+## 📋 Resumo Estruturado dos Domínios (Blueprint)
+
+| Domínio | Peso | Foco Principal |
+| :--- | :---: | :--- |
+| **1. Application Generation & Scoping** | 20% | Arquitetura de escopo (`x_`), herança de tabelas e **ServiceNow SDK**. |
+| **2. Application User Interface (UI)** | 19% | Views, Related Lists (1:M/M:M) e configuração de menus/módulos. |
+| **3. Client-Side Scripting** | 23% | APIs `g_form` e `g_user`, Scripts `onChange` e **UI Policies**. |
+| **4. Server-Side Scripting** | 22% | Business Rules, **GlideRecord**, **GlideAjax** e Script Includes. |
+| **5. Securing Applications** | 11% | **ACLs**, Tríade de Segurança e hierarquia de avaliação. |
+| **6. Managing Code Changes** | 5% | **Update Sets** (metadados apenas) e Integração com **Git**. |
+
+---
+
+## 🛠️ Conceitos Avançados e "Cicatrizes" (Pegadinhas)
+
+### Scripts e Performance
+*   **A Ponte g_scratchpad:** Utilize **Display Business Rules** para passar dados do servidor para o cliente no carregamento do formulário, evitando chamadas `GlideAjax` desnecessárias.
+*   **UI Policies vs. Client Scripts:** UI Policies executam **depois** dos Client Scripts e têm precedência. Use-as sempre que possível para lógica "zero code" (Obrigatoriedade, Visibilidade, Leitura).
+*   **O Perigo do `current.update()`:** Nunca utilize este comando em Business Rules do tipo **'Before'**. Isso causa loops recursivos, pois a gravação no banco já ocorre automaticamente após a regra.
+
+### Segurança (ACLs)
+Acesso é concedido apenas se a **Tríade de Segurança** for `TRUE` simultaneamente: **Roles + Conditions + Script**.
+1.  **Nível de Tabela:** Avaliado primeiro (ex: `incident.None`).
+2.  **Nível de Campo:** Avaliado se o acesso à tabela for permitido (ex: `incident.short_description` ou o curinga `incident.*`).
+
+---
+
+## 📖 Glossário de Termos Chave
+
+*   **Scoped Application:** Aplicação isolada com prefixo `x_` para evitar conflitos de nomenclatura e proteger recursos.
+*   **Dictionary Override:** Permite alterar atributos de um campo herdado (ex: tornar 'Task.short_description' obrigatório apenas na sua tabela).
+*   **GlideRecord:** API padrão para operações CRUD no banco de dados.
+*   **AbstractAjaxProcessor:** Classe que deve ser estendida em um Script Include para permitir chamadas via `GlideAjax`.
+*   **Update Set:** Recipiente de configurações (metadados). **Importante:** Não captura registros de dados (incidentes, usuários, etc.).
+*   **ServiceNow Fluent:** Linguagem DSL para definir tabelas e lógica diretamente via código no **ServiceNow SDK**.
+
+---
+
+## 🤖 Prompts Reutilizáveis para Revisão
+
+Utilize os prompts abaixo em ferramentas de IA para validar seu conhecimento:
+
+```markdown
+# 1. Teste de Ordem de Execução
+"Explique o que acontece se um Client Script definir um campo como opcional, mas uma UI Policy determinar que ele é obrigatório. Qual será o resultado final e por quê?"
+
+# 2. Desafio de Scripting (Server-side)
+"Por que o comando current.update() é proibido em Business Rules 'Before' e qual o risco de usá-lo em regras 'After'?"
+
+# 3. Simulação de Segurança (ACLs)
+"Se um usuário tem a Role correta, mas a Condição da ACL é falsa, ele consegue visualizar o registro? Justifique com base na Tríade de Segurança."
+
+# 4. Performance e g_scratchpad
+"Dê um exemplo prático de como usar g_scratchpad em uma Display Business Rule para evitar um roundtrip ao servidor via GlideAjax."
+
+# 5. Update Sets vs. Dados
+"Criei uma tabela e inseri 50 registros. Ao mover o Update Set para Teste, a tabela e os registros estarão lá? Explique a diferença entre metadados e registros de dados."
+```
+
+---
+*Este guia foi gerado com base no Blueprint oficial CAD 2026 e em bancos de questões preparatórias.*
