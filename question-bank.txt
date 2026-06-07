@@ -1,0 +1,303 @@
+================================================================================
+SERVICENOW CERTIFIED APPLICATION DEVELOPER (CAD) - COMPREHENSIVE QUESTION BANK
+================================================================================
+
+--------------------------------------------------------------------------------
+SECTION 1: APPLICATION GENERATION AND SCOPING
+--------------------------------------------------------------------------------
+
+QUESTION 001:
+Which of the following is true regarding the prefix automatically assigned to artifacts in a scoped application?
+A. The prefix is always 'u_' followed by the developer's name.
+B. The prefix is 'x_' followed by a company identifier and the application name.
+C. Scoped applications do not use prefixes; only Global applications do.
+D. The prefix is dynamically generated using a random 16-character alphanumeric string.
+
+CORRECT ANSWER: B
+EXPLANATION: To guarantee uniqueness and avoid naming collisions across different instances and applications, ServiceNow automatically prefixes all scoped application artifacts with 'x_[company_id]_[app_id]'.
+
+---
+
+QUESTION 002:
+A developer wants to restrict a custom table so that scripts from other application scopes can query its records but cannot insert or update data. Which settings must be configured on the table?
+A. Application Access: Allow access to this table via web services only.
+B. Application Access: Accessible from 'All application scopes' with 'Can read' selected, and 'Can create' and 'Can update' deselected.
+C. Table Protection: Set to 'Read-Only' in the Global dictionary override.
+D. Access Control Lists: Create an asterisk (*) rule with a blocking script.
+
+CORRECT ANSWER: B
+EXPLANATION: The 'Application Access' section on a table record defines cross-scope runtime permissions. Selecting 'All application scopes' and checking only 'Can read' achieves exactly this level of protection.
+
+---
+
+QUESTION 003:
+When using the modern ServiceNow SDK toolchain, what is the purpose of the 'now.config.json' file?
+A. It stores the live user session credentials for authentication.
+B. It functions as the application manifest, mapping local source code and metadata structure to the target instance.
+C. It acts as a local replacement for the database schema.
+D. It contains the JavaScript compilation rules for Babel.
+
+CORRECT ANSWER: B
+EXPLANATION: In the modern local-development workflow using the ServiceNow SDK and Fluent, 'now.config.json' behaves as the deployment manifest, defining the configuration, scoping parameters, and targets for deployment.
+
+---
+
+QUESTION 004:
+You extend the 'Task' table to create a custom 'Vehicle Repair' table. Which fields are automatically inherited by your new custom table?
+A. Only the 'sys_id' field.
+B. No fields are inherited; custom tables must define all attributes manually.
+C. Fields such as 'sys_id', 'number', 'priority', 'state', 'short_description', and 'assignment_group'.
+D. Only custom fields prefixed with 'u_'.
+
+CORRECT ANSWER: C
+EXPLANATION: Table inheritance in ServiceNow means the child table automatically receives all column definitions from the parent table. Extending 'Task' provides baseline operational fields out of the box.
+
+---
+
+QUESTION 005:
+What is the purpose of a Dictionary Override in ServiceNow development?
+A. To alter the label of a field globally across all views in the instance.
+B. To redefine field attributes (like default values, mandatory states, or reference qualifiers) on an extended table without changing its behavior on the parent table.
+C. To override access control lists for administrative accounts.
+D. To change the scope of an existing field from Global to Scoped.
+
+CORRECT ANSWER: B
+EXPLANATION: Dictionary Overrides allow child tables to deviate from the inherited dictionary settings of the parent table safely, maintaining schema integrity on the parent.
+
+--------------------------------------------------------------------------------
+SECTION 2: APPLICATION USER INTERFACE (UI)
+--------------------------------------------------------------------------------
+
+QUESTION 006:
+When creating a new form view for a scoped application, what is the best practice for making fields visible to specific roles without modifying core structural configurations?
+A. Hardcode role visibility directly into the table dictionary.
+B. Create form views tailored to specific roles and configure Application Modules or Workspaces to trigger those views based on user access.
+C. Delete the fields from the default view so no one else can see them.
+D. Use a client script that clears the browser cache on form layout rendering.
+
+CORRECT ANSWER: B
+EXPLANATION: Creating dedicated Views and routing users to them based on application context, modules, or workspaces is the cleanest UI design pattern for role-based interface variation.
+
+---
+
+QUESTION 007:
+What is a Related List on a ServiceNow form?
+A. A dropdown menu that lists similar fields.
+B. A list displayed at the bottom of a form showing records from another table that have a 1-to-many or many-to-many relationship with the current record.
+C. A list of users currently viewing the same record.
+D. A navigation link to the product documentation portal.
+
+CORRECT ANSWER: B
+EXPLANATION: Related Lists display related database records at the bottom of a form view, using reference fields or many-to-many relationship tables to dynamically query the database contextually.
+
+---
+
+QUESTION 008:
+How does a developer control the order of modules inside an Application Menu in the classic Next Experience navigation panel?
+A. Alphabetically by field label.
+B. By configuring the 'Order' field with numerical values (e.g., 100, 200, 300); lower numbers appear first.
+C. Modules are ordered automatically based on creation date.
+D. Modules are sorted dynamically by frequency of user interaction.
+
+CORRECT ANSWER: B
+EXPLANATION: The 'Order' field takes integer values. ServiceNow renders elements sequentially from the lowest number to the highest number. Spacing numbers out by 100s allows for easy future additions.
+
+--------------------------------------------------------------------------------
+SECTION 3: CLIENT-SIDE SCRIPTING & UI AUTOMATION
+--------------------------------------------------------------------------------
+
+QUESTION 009:
+An 'onChange()' Client Script is executing unexpectedly when the form first loads, causing performance issues. What condition statement is missing to prevent this behavior?
+A. if (newValue == oldValue)
+B. if (isLoading || newValue === '')
+C. if (current.isNewRecord())
+D. if (g_form.isLive())
+
+CORRECT ANSWER: B
+EXPLANATION: By default, 'onChange()' scripts fire when the form loads to evaluate the initial value. Checking 'if (isLoading)' allows the developer to explicitly return early and halt execution until a real user interaction occurs.
+
+---
+
+QUESTION 010:
+Which client-side API method should be used to dynamically make a field read-only on a form layout?
+A. g_form.setReadOnly('field_name', true);
+B. g_form.setMandatory('field_name', false);
+C. current.setReadOnly('field_name', true);
+D. gs.setReadOnlyField('field_name');
+
+CORRECT ANSWER: A
+EXPLANATION: The 'g_form' global object represents the client-side API for managing forms. The proper, supported method to toggle write privileges dynamically on the browser is 'g_form.setReadOnly()'.
+
+---
+
+QUESTION 011:
+You need to ensure that a field is mandatory only when the 'State' of a record is 'In Progress'. No complex logic or string manipulations are required. What is the recommended configuration path?
+A. Write an 'onSubmit()' Client Script.
+B. Create a UI Policy with a condition 'State is In Progress' and a UI Policy Action setting the target field to Mandatory = True.
+C. Write a 'Before' Business Rule using 'current.setMandatory()'.
+D. Configure an Access Control List rule.
+
+CORRECT ANSWER: B
+EXPLANATION: Best practice dictation states: "Use UI Policies instead of Client Scripts whenever possible for managing field visibility, mandatory status, and read-only status because UI Policies require zero code and perform better."
+
+---
+
+QUESTION 012:
+Which client-side object is used to check if the currently logged-in user possesses a specific organizational role?
+A. gs.hasRole()
+B. g_form.getUserRole()
+C. g_user.hasRole()
+D. current.user.hasRole()
+
+CORRECT ANSWER: C
+EXPLANATION: The 'g_user' API is explicitly designed for client-side user context validation. 'g_user.hasRole()' evaluates if the active browser session holds the specified access permission.
+
+---
+
+QUESTION 013:
+What happens if a Client Script and a UI Policy conflict on a form field attribute (e.g., the script sets it to optional, but the policy sets it to mandatory)?
+A. The form crashes and throws a JavaScript console error.
+B. The Client Script always takes precedence because it contains code.
+C. The UI Policy takes precedence because UI Policies execute AFTER Client Scripts.
+D. The system randomly toggles between behaviors based on processor execution speed.
+
+CORRECT ANSWER: C
+EXPLANATION: In the ServiceNow client-side execution lifecycle, UI Policies execute strictly after Client Scripts have completed their loops. Therefore, the UI Policy will overwrite any conflicting values set by prior scripts.
+
+--------------------------------------------------------------------------------
+SECTION 4: SERVER-SIDE SCRIPTING & ADVANCED LOGIC
+--------------------------------------------------------------------------------
+
+QUESTION 014:
+A developer needs to update records on a related table automatically whenever a custom record is changed, but this processing takes several seconds. Which type of Business Rule should be utilized to maintain a fast UI response time?
+A. Before Business Rule
+B. Display Business Rule
+C. Async Business Rule
+D. OnCellEdit Business Rule
+
+CORRECT ANSWER: C
+EXPLANATION: 'Async' Business Rules are pushed into the instance's background event queue (sys_trigger) and run completely independent of the user's thread. This allows the database transaction to close immediately, ensuring the browser doesn't freeze for the user.
+
+---
+
+QUESTION 015:
+Within a 'Before' Business Rule script, which variable references the record's values as they existed in the database before the current user transaction modified them?
+A. current
+B. previous
+C. g_scratchpad
+D. database.old
+
+CORRECT ANSWER: B
+EXPLANATION: The 'previous' global variable holds the baseline state of the row object prior to modification. 'current' holds the dirty object containing uncommitted changes. Note that 'previous' is not accessible in Async or Display rules.
+
+---
+
+QUESTION 016:
+You need to pass data calculated on the server layer directly to a client script when a form initializes, minimizing database roundtrips. How can you accomplish this?
+A. Execute an asynchronous GlideAjax call in an onLoad Client Script.
+B. Use a Display Business Rule to populate values into the 'g_scratchpad' object, then read 'g_scratchpad' inside the Client Script.
+C. Use a text template inside a dictionary override.
+D. Call 'gs.getContext()' from the browser console.
+
+CORRECT ANSWER: B
+EXPLANATION: The 'g_scratchpad' object is an explicit bridge built for performance. It allows a Display Business Rule to attach server data to the form payload directly before it leaves the server, completely eliminating downstream API calls.
+
+---
+
+QUESTION 017:
+Which server-side class is instantiated to perform CRUD operations (Create, Read, Update, Delete) on database tables?
+A. GlideForm
+B. GlideRecord
+C. GlideSystem
+D. GlideQueryFilter
+
+CORRECT ANSWER: B
+EXPLANATION: 'GlideRecord' is the fundamental, omnipresent Object-Relational Mapping (ORM) API used within ServiceNow scripts to interact with the underlying database tables and rows.
+
+---
+
+QUESTION 018:
+What is a Script Include in the ServiceNow environment?
+A. A method used to import jQuery libraries into UI Pages.
+B. A reusable, modular server-side JavaScript block that defines classes or functions, executing only when explicitly instantiated or invoked by other backend processes.
+C. A macro used to embed HTML layouts into forms.
+D. A configuration file that dictates which tables are loaded during instance reboots.
+
+CORRECT ANSWER: B
+EXPLANATION: Script Includes represent the standard for object-oriented, reusable development on the server. They decouple application logic from single touchpoints like Business Rules, streamlining code management.
+
+---
+
+QUESTION 019:
+When writing a Client-Callable Script Include to handle a 'GlideAjax' request from the front-end, what baseline class must your custom Script Include extend?
+A. BaseScriptInclude
+B. AbstractAjaxProcessor
+C. GlideRecordServer
+D. Object.prototype
+
+CORRECT ANSWER: B
+EXPLANATION: To properly expose an endpoint to client-side 'GlideAjax' requests, the Script Include must extend 'AbstractAjaxProcessor'. This inherits the internal framework logic required to parse query parameters and return XML/JSON streams.
+
+--------------------------------------------------------------------------------
+SECTION 5: SECURING APPLICATIONS & DATA ACCESS
+--------------------------------------------------------------------------------
+
+QUESTION 020:
+A user has the correct role required by an Access Control List (ACL) rule, but the condition builder on that same ACL evaluates to False for the record they are viewing. What access does the user receive?
+A. The user receives Read access but cannot write data.
+B. Access is completely denied.
+C. Access is granted because roles always override local record conditions.
+D. The system prompts the administrator for an override ticket.
+
+CORRECT ANSWER: B
+EXPLANATION: For an ACL rule to resolve successfully and grant access, all three evaluating criteria (Roles, Conditions, AND Script) must evaluate to True simultaneously. If any piece fails, access is denied.
+
+---
+
+QUESTION 021:
+What is the proper evaluation order when a user attempts to read a field on a specific record governed by field-level and table-level Access Control Lists?
+A. Field-level ACLs are evaluated first, then Table-level ACLs.
+B. Table-level ACLs are evaluated first (e.g., incident.None). If granted, the system then evaluates field-level ACLs (e.g., incident.short_description).
+C. The system checks UI Policies before evaluating ACL rules.
+D. Global application permissions override all explicit security settings.
+
+CORRECT ANSWER: B
+EXPLANATION: Security evaluation follows a top-down hierarchy. Access to the container (the Table) must be granted first. If a user is locked out at the table level, the system short-circuits execution and completely ignores field-specific permissions.
+
+--------------------------------------------------------------------------------
+SECTION 6: TRACKING AND MANAGING CODE CHANGES
+--------------------------------------------------------------------------------
+
+QUESTION 022:
+Which of the following modifications is captured automatically within a developer Update Set?
+A. A new test user account created for validation testing.
+B. An updated Business Rule script.
+C. A new corporate asset record added to the CMDB.
+D. Transactional logs generated by an active integration endpoint.
+
+CORRECT ANSWER: B
+EXPLANATION: Update Sets track and capture structural configurations and process logic (metadata) such as scripts, fields, tables, views, and forms. They explicitly ignore transactional runtime data (records, accounts, incidents).
+
+---
+
+QUESTION 023:
+What risk occurs if a developer deletes an Update Set that has already been exported, shipped, and committed to a downstream Production instance?
+A. The Production instance will automatically rollback all its database changes.
+B. The local development environment will experience an application scope freeze.
+C. Deleting the source container record locally does not break the target instance code, but it completely destroys the historical traceability and baseline reference map needed for upgrades.
+D. The production user data tables will get corrupted.
+
+CORRECT ANSWER: C
+EXPLANATION: Once an Update Set is committed on a target instance, its payload is written directly to the database layer of that instance. Deleting the local Update Set metadata record from the Development sandbox afterward is highly discouraged because it breaks compliance logging, but it doesn't automatically delete the functional code running in production.
+
+---
+
+QUESTION 024:
+How does Source Control integration interact with Scoped Applications in ServiceNow?
+A. It completely replaces the database, writing all transactional rows to git.
+B. It allows an application scope to link to external Git providers (e.g., GitHub), enabling developers to commit, branch, stash, and merge configurations as application code directly from Studio.
+C. It is restricted to Global application development only.
+D. It forces all client scripts to run inside a Docker container locally.
+
+CORRECT ANSWER: B
+EXPLANATION: Source Control integration maps scoped applications directly to a designated Git repository. Studio translates application metadata configurations into structured XML or code schemas, giving teams real version-control workflows.

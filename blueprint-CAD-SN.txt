@@ -1,0 +1,131 @@
+================================================================================
+SERVICENOW CERTIFIED APPLICATION DEVELOPER (CAD) - EXAM BLUEPRINT 2026
+================================================================================
+
+1. APPLICATION GENERATION AND SCOPING (Weight: 20%)
+--------------------------------------------------------------------------------
+* Scope Architecture:
+  - Global Scope vs. Scoped Applications: Scoped apps isolate artifacts to prevent 
+    naming conflicts, unauthorized API access, and cross-app corruption.
+  - Namespace Prefix: Every artifact in a scoped application is automatically 
+    prefixed with 'x_' followed by a company identifier and the application name.
+  - Artifact Protection: Scoped applications can strictly control access to their 
+    tables, endpoints, and scripts via Application Access settings.
+
+* Data Model Configuration:
+  - Table Creation: Custom tables can extend existing platform tables (e.g., 
+    extending 'Task' or 'Configuration Item') or be created from scratch.
+  - Inheritance: Tables extending 'Task' inherit baseline fields like 'sys_id', 
+    'number', 'opened_at', 'short_description', and 'assignment_group'.
+  - Dictionary Overrides: Used to alter the behavior or attributes of a field 
+    on an extended table without changing the field's behavior on the parent table.
+
+* Modern Application Toolchain:
+  - ServiceNow SDK: A modern TypeScript/JavaScript developer toolchain allowing 
+    developers to build application metadata locally.
+  - Manifest Configuration: Controlled via 'now.config.json' and standard Node 
+    'package.json' structures for local-to-cloud deployments.
+  - ServiceNow Fluent: A domain-specific language (DSL) to define tables, 
+    ACLs, and business logic directly in code files instead of the platform UI.
+
+2. APPLICATION USER INTERFACE (UI) (Weight: 19%)
+--------------------------------------------------------------------------------
+* Layout Components:
+  - Form & List Customization: Creating views tailored to specific roles or states.
+  - Form Sections: Grouping logical fields together to enhance user experience.
+  - Related Lists: Displaying records from other tables that have a one-to-many 
+    (1:M) or many-to-many (M:M) relationship with the current record.
+
+* Navigation Experience:
+  - Application Menus and Modules: Configuring visibility based on Roles.
+  - Next Experience UI & Workspaces: Transitioning classic UI components into 
+    modern, tabbed, highly visual agent workspaces.
+
+3. CLIENT-SIDE SCRIPTING & UI AUTOMATION (Weight: 23%)
+--------------------------------------------------------------------------------
+* Client Scripts:
+  - Execution Context: Runs strictly within the user's browser.
+  - Script Types:
+    - onLoad(): Runs when the form first loads, before user interaction.
+    - onChange(): Runs when a specific field's value changes. Requires checking 
+      'isLoading' and 'newValue === oldValue' flags to prevent infinite loops.
+    - onSubmit(): Runs when the user saves or submits the form. Used to validate 
+      data or cancel submission by returning 'false'.
+    - onCellEdit(): Runs when a value is changed directly within a list view.
+  - Global Objects:
+    - g_form: Provides methods to control form fields (e.g., g_form.setValue(), 
+      g_form.setMandatory(), g_form.setDisplay(), g_form.getErrorBox()).
+    - g_user: Provides information about the currently logged-in user (e.g., 
+      g_user.hasRole(), g_user.userID).
+
+* UI Policies:
+  - Purpose: Client-side logic that manages field attributes (Mandatory, Read-Only, 
+    Visible) dynamically based on conditions without writing code.
+  - Execution Order: UI Policies run AFTER Client Scripts. If a Client Script 
+    and a UI Policy conflict, the UI Policy will win.
+
+4. SERVER-SIDE SCRIPTING & ADVANCED LOGIC (Weight: 22%)
+--------------------------------------------------------------------------------
+* Business Rules:
+  - Execution Context: Runs on the ServiceNow database server when records are 
+    inserted, updated, deleted, or queried.
+  - Execution Types:
+    - Before: Runs after form submission but BEFORE the database writes the data. 
+      Used to change field values on the current record.
+    - After: Runs AFTER the database writes the data. Used to update related records.
+    - Async: Runs asynchronously in the background via the event queue. Used for 
+      heavy processing tasks (e.g., integrations) to keep the UI fast.
+    - Display: Runs when data is read from the database, right before the form 
+      loads. Uses 'g_scratchpad' to pass server data straight to the client script.
+  - Core Global Objects:
+    - current: Represents the active record being modified.
+    - previous: Represents the record's values *before* changes were made (not 
+      available in 'async' or 'display' rules).
+    - gs (GlideSystem): Server-side utility class (e.g., gs.addInfoMessage(), 
+      gs.getUserID(), gs.hasRole()).
+
+* Script Includes:
+  - Definition: Reusable server-side JavaScript libraries that execute only when 
+    explicitly called.
+  - Client-Callable Script Includes: Must extend 'AbstractAjaxProcessor'. Used in 
+    combination with the client-side 'GlideAjax' API to pass data asynchronously 
+    from the client to the server and back without locking the browser UI.
+
+* Database Queries via GlideRecord:
+  - Server-side class used for database operations.
+  - Standard Query Pattern:
+    var gr = new GlideRecord('x_custom_table');
+    gr.addQuery('active', true);
+    gr.query();
+    while(gr.next()) {
+        // Logic execution
+    }
+
+5. SECURING APPLICATIONS & DATA ACCESS (Weight: 11%)
+--------------------------------------------------------------------------------
+* Access Control Lists (ACLs):
+  - Purpose: Object-level and field-level security rule enforcement.
+  - Evaluation Order:
+    1. Contextual Security / Table-level ACLs (e.g., incident.None).
+    2. Field-level ACLs (e.g., incident.short_description).
+  - The Security Triad: For an ACL to grant access, three components must ALL 
+    evaluate to True:
+    - Roles: The user must possess the required security role.
+    - Conditions: The record fields must match the defined condition builder.
+    - Script: The server-side script must return 'answer = true;'.
+
+6. TRACKING AND MANAGING CODE CHANGES (Weight: 5%)
+--------------------------------------------------------------------------------
+* Update Sets:
+  - Purpose: Containers used to group configuration changes so they can be moved 
+    from a Development instance to a Test or Production instance.
+  - Captured Artifacts: Process logic (Business Rules, Client Scripts, Script 
+    Includes), UI components (Forms, Views, Workspaces), and Table Definitions.
+  - NOT Captured: Data records (e.g., actual Incidents, Users, Assets), schedules, 
+    and transactional logs.
+
+* Source Control Integration:
+  - Applications can link directly to Git-repositories (GitHub, GitLab, Bitbucket).
+  - Enables branching, committing, stashing, and merging application configurations 
+    directly within Studio or the developer interface.
+

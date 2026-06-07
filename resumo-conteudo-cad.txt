@@ -1,0 +1,186 @@
+================================================================================
+SERVICENOW CAD CERTIFICATION - EXHAUSTIVE STUDY GUIDE & TRAPS (2026)
+================================================================================
+
+--------------------------------------------------------------------------------
+BLOCO 1: APPLICATION GENERATION AND SCOPING (Peso: 20%)
+--------------------------------------------------------------------------------
+Este módulo avalia sua capacidade de projetar o modelo de dados de um aplicativo, 
+entender o isolamento de código e utilizar as ferramentas modernas de desenvolvimento.
+
+1. Arquitetura de Escopo (Global vs. Scoped)
+   * O escopo Global (onde residem módulos nativos antigos como Incident e Problem) 
+     permite que qualquer script altere qualquer tabela. Isso gera riscos de 
+     segurança e conflitos de nomenclatura.
+   * Aplicações Escopadas (Scoped Apps) isolam os artefatos de software. Tudo o 
+     que é criado ganha um prefixo imutável (ex: 'x_sua_empresa_app_'). Se um 
+     script de fora tentar acessar um recurso privado da sua aplicação, o sistema 
+     bloqueia a execução em tempo de execução (runtime).
+   * Cuidado com o "Application Access" nas tabelas: É aqui que você define se 
+     outros escopos podem ler (Can read), criar (Can create), atualizar (Can update) 
+     ou deletar (Can delete) registros da sua tabela, ou se o acesso é restrito 
+     apenas via Web Services.
+
+2. Modelo de Dados e Herança de Tabelas
+   * Ao criar uma tabela, você pode estender uma existente. A tabela mais estendida 
+     do sistema é a tabela 'Task' (Tarefa). Ao estendê-la, sua nova tabela herda 
+     automaticamente dezenas de campos padrão (sys_id, number, priority, state, 
+     assignment_group, short_description).
+   * Tabelas que não estendem nenhuma outra são chamadas de "Stand-alone tables" e 
+     nascem apenas com os campos de sistema (sys_id, sys_created_on, sys_updated_by).
+
+🚨 PEGADINHAS DA BANCA (BLOCO 1):
+   * A prova vai tentar te confundir sobre "Dictionary Overrides" (Sobrecarga de 
+     Dicionário). Lembre-se: se você estendeu a tabela Task e precisa que o campo 
+     "Short Description" seja obrigatório *apenas* na sua tabela filha, você DEVE 
+     usar um Dictionary Override. Se você alterar o dicionário diretamente, tornará 
+     o campo obrigatório na tabela Task inteira (o que quebrará o Incident e o Change).
+   * Prefixo de tabelas: Tabelas customizadas no escopo Global começam com 'u_'. 
+     Tabelas em aplicações escopadas começam com 'x_'. A prova adora inverter isso.
+
+--------------------------------------------------------------------------------
+BLOCO 2: APPLICATION USER INTERFACE - UI (Peso: 19%)
+--------------------------------------------------------------------------------
+Focado em como os dados são apresentados e como o usuário interage visualmente 
+com as aplicações, considerando tanto a interface clássica quanto as novas interfaces.
+
+1. Elementos do Formulário e Listas
+   * Views (Visualizações): Permitem exibir o mesmo registro com layouts de campos 
+     diferentes dependendo do papel (Role) do usuário ou do módulo de navegação.
+   * Related Lists (Listas Relacionadas): Aparecem no rodapé do formulário. Elas 
+     representam relacionamentos de banco de dados do tipo 1 para Muitos (1:M) ou 
+     Muitos para Muitos (M:M). Exemplo: Um registro de uma tabela customizada de 
+     "Carro" mostrando uma lista relacionada de "Manutenções Realizadas".
+
+2. Navegação e Menus de Aplicativo
+   * Application Menus são os títulos principais no painel de navegação, e Modules 
+     são os links internos. Ambos utilizam o campo 'Order' (numérico) para definir 
+     quem aparece primeiro (valores menores sobem na lista). O controle de acesso 
+     visual é feito inserindo Roles diretamente nas configurações do menu/módulo.
+
+🚨 PEGADINHAS DA BANCA (BLOCO 2):
+   * Form Section vs. Related List: A prova criará um cenário onde você precisa 
+     mostrar dados de outra tabela no formulário atual e perguntará se você usa uma 
+     Form Section. Resposta Errada! Form Sections apenas agrupam campos da *própria* 
+     tabela. Para dados de tabelas estrangeiras, usa-se obrigatoriamente Related Lists.
+
+--------------------------------------------------------------------------------
+BLOCO 3: CLIENT-SIDE SCRIPTING & UI AUTOMATION (Peso: 23%)
+--------------------------------------------------------------------------------
+Este é o bloco com maior peso na prova. Avalia a automação lógica que roda diretamente 
+no navegador do usuário final para melhorar a experiência (UX).
+
+1. Tipos de Client Scripts (Executam no Navegador)
+   * onLoad(): Roda assim que o formulário termina de carregar, antes do usuário mexer.
+   * onChange(): Roda quando um campo específico sofre alteração.
+   * onSubmit(): Roda quando o usuário clica em Save, Submit ou Update. É usado 
+     para validações de segurança de última hora antes dos dados irem pro servidor. 
+     Para cancelar o envio, o script precisa retornar 'false'.
+   * onCellEdit(): Roda quando o usuário altera um valor diretamente através de 
+     uma lista (List View), sem abrir o formulário.
+
+2. APIs Globais do Cliente
+   * g_form: API para manipular o formulário. Métodos obrigatórios para a prova: 
+     g_form.setValue(), g_form.getValue(), g_form.setMandatory(), 
+     g_form.setReadOnly(), g_form.setDisplay() (oculta o campo e remove o espaço dele) 
+     e g_form.setVisible() (oculta o campo mas mantém o espaço em branco).
+   * g_user: Fornece o contexto do usuário logado no navegador. Métodos principais: 
+     g_user.hasRole('itil') e g_user.userID (retorna o sys_id do usuário atual).
+
+3. UI Policies (Políticas de Interface)
+   * Alternativa declarativa (sem código) para gerenciar se um campo é Obrigatório, 
+     Lido-Apenas ou Visível com base em uma condição.
+
+🚨 PEGADINHAS DA BANCA (BLOCO 3):
+   * O loop infinito do onChange(): Todo script onChange() nasce com a validação 
+     'if (isLoading || newValue === "") { return; }'. A prova vai te perguntar o que 
+     acontece se você remover o 'isLoading'. Resposta: O script entrará em loop infinito 
+     porque o carregamento inicial do formulário é interpretado como uma mudança de valor.
+   * Ordem de Execução: Client Scripts rodam ANTES de UI Policies. Se houver conflito 
+     de lógica entre os dois, a UI Policy ganha porque ela executa por último.
+
+--------------------------------------------------------------------------------
+BLOCO 4: SERVER-SIDE SCRIPTING & ADVANCED LOGIC (Peso: 22%)
+--------------------------------------------------------------------------------
+Avalia a lógica de negócios pesada, que processa dados diretamente no banco de dados 
+e servidores da ServiceNow.
+
+1. Business Rules (Regras de Negócio)
+   * Roda no servidor quando um registro é inserido (inserted), atualizado 
+     (updated), deletado (deleted) ou consultado (queried).
+   * Tipos de execução cruciais:
+     - Before: Executa após o submit, mas ANTES dos dados serem gravados no banco. 
+       Ideal para validar campos e mudar valores do próprio registro ('current').
+     - After: Executa DEPOIS que os dados foram gravados no banco. Ideal para 
+       atualizar tabelas relacionadas.
+     - Async (Assíncrona): Entra na fila de segundo plano do servidor. O usuário não 
+       fica esperando o script terminar. Essencial para integrações de API pesadas.
+     - Display: Executa quando o registro é lido do banco, antes do formulário ser 
+       desenhado na tela. Alimenta o objeto 'g_scratchpad' para passar variáveis 
+       do servidor direto para os Client Scripts.
+
+2. APIs de Servidor (GlideRecord e GlideSystem)
+   * GlideRecord: Classe ORM para ler/escrever no banco. Estrutura padrão:
+     var gr = new GlideRecord('tabela');
+     gr.addQuery('campo', 'valor');
+     gr.query();
+     while(gr.next()) { ... }
+   * GlideSystem (gs): Fornece utilitários do sistema. Ex: gs.getUserID(), 
+     gs.hasRole(), gs.addInfoMessage(), gs.log().
+
+3. Script Includes e GlideAjax
+   * Script Includes são blocos de código JavaScript reutilizáveis no servidor.
+   * Para chamar um código de servidor de dentro de um Client Script sem travar a 
+     tela do usuário, usa-se a combinação de GlideAjax (no cliente) com um Script 
+     Include que estende a classe 'AbstractAjaxProcessor' (no servidor).
+
+🚨 PEGADINHAS DA BANCA (BLOCO 4):
+   * current.update() proibido: NUNCA use 'current.update()' dentro de uma Business 
+     Rule do tipo 'Before'. Isso causa um loop recursivo que pode derrubar a performance 
+     da instância, pois o comando dispara a própria regra novamente.
+   * A variável 'previous' não está disponível em Business Rules do tipo Async e Display.
+
+--------------------------------------------------------------------------------
+BLOCO 5: SECURING APPLICATIONS & DATA ACCESS (Peso: 11%)
+--------------------------------------------------------------------------------
+Segurança a nível de banco de dados usando Access Control Lists (ACLs).
+
+1. Estrutura e Funcionamento de ACLs
+   * ACLs controlam quem tem permissão de CRUD em tabelas ou campos específicos.
+   * Para que o acesso seja concedido em uma ACL, a Tríade de Segurança inteira 
+     deve ser verdadeira: Roles do usuário AND Condições de campo AND Script de validação.
+
+2. Processo de Avaliação (Hierarquia)
+   * Avaliação de Contexto (Tabela): O usuário precisa passar primeiro pela regra 
+     da tabela (ex: 'incident.None'). Se falhar aqui, o acesso é totalmente negado.
+   * Avaliação de Campo: Se passou pela tabela, o sistema avalia a regra específica 
+     do campo (ex: 'incident.short_description').
+
+🚨 PEGADINHAS DA BANCA (BLOCO 5):
+   * O significado do caractere curinga Asterisco (*): Na prova, eles vão testar 
+     seu entendimento sobre 'incident.None' vs 'incident.*'. Lembre-se: 'None' 
+     aplica-se à tabela inteira como um contêiner. O '*' aplica-se a todos os campos 
+     daquela tabela que não possuam uma ACL específica própria.
+
+--------------------------------------------------------------------------------
+BLOCO 6: TRACKING AND MANAGING CODE CHANGES (Peso: 5%)
+--------------------------------------------------------------------------------
+Ciclo de vida de desenvolvimento, empacotamento e movimentação de código.
+
+1. Update Sets (Conjuntos de Atualização)
+   * Capturam customizações de design e lógica (Process Records) para movê-las entre 
+     instâncias (Desenvolvimento -> Teste -> Produção).
+   * O que é capturado: Business Rules, Client Scripts, Script Includes, Tabelas, 
+     Campos, Formulários, Workflows, Views.
+   * O que NÃO é capturado (Data Records): Usuários, Grupos, Incidentes criados, 
+     Ativos de TI, logs, agendamentos.
+
+2. Integração com Controle de Versão (Git)
+   * Aplicações Escopadas podem se conectar diretamente a repositórios como o GitHub 
+     através do ServiceNow Studio, permitindo ramificações (branches) e commits.
+
+🚨 PEGADINHAS DA BANCA (BLOCO 6):
+   * Movimentação de dados: A prova vai propor um cenário onde você criou 10 registros 
+     de teste em uma tabela e mudou o script de uma Business Rule, tudo usando um 
+     Update Set. Ela perguntará o que chega no ambiente de Teste. Resposta: Apenas a 
+     Business Rule e a estrutura da tabela. Os 10 registros de dados serão ignorados.
